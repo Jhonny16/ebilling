@@ -32,9 +32,11 @@ class AccountMoveLine(models.Model):
                 if allowed_cabys.filtered(lambda x: x.exoneration_code and x.exoneration_code in product_id.product_cabys_id.code):
                     line.l10n_cr_has_exoneration = True
 
+
     # extends
     def _get_computed_taxes(self):
-        if self.move_id.l10n_cr_has_exoneration and self.move_id.fiscal_position_id and self.move_id.country_code == 'CR' and self.move_id.l10n_cr_fiscal_journal:
+        if (self.move_id.l10n_cr_has_exoneration and self.move_id.fiscal_position_id and self.move_id.country_code == 'CR' and self.move_id.l10n_cr_fiscal_journal)\
+                or (self.move_id.l10n_cr_has_exoneration and self.move_id.partner_id.tax_id):
             self.ensure_one()
 
             company_domain = self.env['account.tax']._check_company_domain(self.move_id.company_id)
@@ -57,6 +59,8 @@ class AccountMoveLine(models.Model):
             if tax_ids and self.move_id.fiscal_position_id and self.l10n_cr_has_exoneration:
                 tax_ids = self.move_id.fiscal_position_id.map_tax(tax_ids)
 
+            if tax_ids and self.l10n_cr_has_exoneration:
+                tax_ids += self.move_id.partner_id.tax_id
             return tax_ids
         else:
             return super()._get_computed_taxes()

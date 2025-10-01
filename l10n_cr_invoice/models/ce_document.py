@@ -726,11 +726,29 @@ class Document(models.Model):
                         else:
                             totals_taxable_vals[tax_iva_id.id] += line.get_MontoTotal()
                     elif tax.get_Exoneracion():
-                        aa = ((tax.get_Tarifa() - tax.get_Exoneracion().get_TarifaExonerada()) / 100)
-                        bb = tax.get_Tarifa() / 100
-                        cc = aa / bb
-                        totals_taxable_vals[tax_iva_id.id] += line.get_MontoTotal() * cc
-                        totals_exoneration_vals[tax_iva_id.id] += line.get_MontoTotal() - (line.get_MontoTotal() * cc)
+                        exoneration = tax.get_Exoneracion()
+                        amount_taxable = tax.Monto - exoneration.MontoExoneracion
+                        if amount_taxable == 0.0:
+                            totals_exoneration_vals[tax_iva_id.id] += line.get_MontoTotal()
+                        else:
+                            if iva_tax_rate_code in ['01', '10']:
+                                totals_exempt_vals[tax_iva_id.id] += line.get_MontoTotal()
+                            else:
+                                totals_taxable_vals[tax_iva_id.id] += line.get_MontoTotal()
+                        #
+                        #
+                        # #aa = ((tax.get_Tarifa() - tax.get_Exoneracion().get_TarifaExonerada()) / 100)
+                        # #bb = tax.get_Tarifa() / 100
+                        # #cc = aa / bb
+                        # #MontoTotal = line.get_MontoTotal()
+                        # #totals_taxable_vals[tax_iva_id.id] += line.get_MontoTotal() * cc
+                        # #totals_exoneration_vals[tax_iva_id.id] += line.get_MontoTotal() - (line.get_MontoTotal() * cc)
+                        # exoneration = tax.get_Exoneracion()
+                        # #totals_exoneration_vals[tax_iva_id.id] += exoneration.MontoExoneracion
+                        # #amount_taxable = tax.Monto - exoneration.MontoExoneracion
+                        # amount_taxable = tax.Monto - exoneration.MontoExoneracion
+                        # if amount_taxable == 0.0:
+                        #     totals_exoneration_vals[tax_iva_id.id] += line.get_MontoTotal()
                     else:
                         if iva_tax_rate_code in ['01', '10']:
                             totals_exempt_vals[tax_iva_id.id] += line.get_MontoTotal()
@@ -913,8 +931,8 @@ class Document(models.Model):
                     item.set_BaseImponible(item.get_SubTotal())
                 impuesto_neto = 0.0
                 # Only taxes with codes IVA.
-                for t in taxes.filtered(
-                        lambda l: l.iva_tax_rate in ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]):
+                tax_ids = taxes.filtered(lambda l: l.iva_tax_rate in ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"] and not l.is_exonerated)
+                for t in tax_ids:
                     imp = t
                     if exoneration and self.invoice_id.fiscal_position_id:
                         for tax_map in self.invoice_id.fiscal_position_id.tax_ids:
@@ -930,6 +948,7 @@ class Document(models.Model):
                         fpos = self.invoice_id.fiscal_position_id
                         if not self.partner_id.l10n_cr_institution_name:
                             raise UserError(_('El cliente debe tener un nombre de institución para la exoneración.'))
+
                         for tax_map in fpos.tax_ids:
                             if tax_map.tax_dest_id.id == t.id and tax_map.tax_src_id.id == imp.id:
                                 purchase_amount = int(imp.amount - t.amount)
@@ -944,6 +963,27 @@ class Document(models.Model):
                                                                        )
                                 impuesto.set_Exoneracion(exoneration)
                                 break
+
+                        tax_exonerated = taxes.filtered(lambda tax: tax.id != t.id and tax.is_exonerated)
+                        for te in tax_exonerated:
+                            porcentaje_exoneracion_calculo = float(abs(te.amount)) / 100
+                            monto_exoneracion = line.price_subtotal * porcentaje_exoneracion_calculo
+                            exoneration = classdoc.ExoneracionType(
+                                TipoDocumento=self.partner_id.l10n_cr_document_type_id.ce_code,
+                                NumeroDocumento=self.partner_id.l10n_cr_document_number,
+                                NombreInstitucion=self.partner_id.l10n_cr_institution_name,
+                                FechaEmision=self.partner_id.l10n_cr_issue_date,
+                                TarifaExonerada=self.partner_id.l10n_cr_percentage_exoneration,
+                                MontoExoneracion=monto_exoneracion,
+                                #TarifaExonerada=purchase_amount,
+                                #MontoExoneracion=monto_exoneracion,
+                                )
+                            impuesto.set_Exoneracion(exoneration)
+                            break
+
+
+
+
 
                     monto_impuesto = float(subtotal_line * imp.amount) / 100
                     impuesto.set_Monto(abs(monto_impuesto))
@@ -1012,6 +1052,7 @@ class Document(models.Model):
             total_exempt_product = totals_vals["TotalMercancias"]['total_exempt']
             total_product_exonerated = totals_vals["TotalMercancias"]['total_exonerado']
             total_product_not_subject = totals_vals["TotalMercancias"]['total_no_subject']
+
         summary = classdoc.ResumenFacturaType(TotalComprobante=0.00, CodigoTipoMoneda=None)
         if self.invoice_id:
             code_currency_type = classdoc.CodigoMonedaType(CodigoMoneda=self.invoice_id.currency_id.name)
@@ -1040,8 +1081,8 @@ class Document(models.Model):
         if self.voucher_type_id.code not in ['09', '10']:
             summary.set_TotalExonerado(round(abs(total_service_exonerated + total_product_exonerated), 5))
         if self.voucher_type_id.code not in ['09', '10']:
-            total_sale = float(summary.get_TotalGravado()) + float(summary.get_TotalExento()) + float(
-                summary.get_TotalExonerado())
+            total_sale = float(summary.get_TotalGravado()) + float(summary.get_TotalExento()) + float(summary.get_TotalExonerado())
+            #total_sale = float(summary.get_TotalGravado()) + float(summary.get_TotalExento())
         else:
             total_sale = float(summary.get_TotalGravado()) + float(summary.get_TotalExento())
         if total_discount > 0.0:

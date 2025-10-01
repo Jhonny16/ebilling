@@ -2,7 +2,7 @@
 {
     "name": "FE - Costa Rica",
     'countries': ['cr'],
-    "version": "18.0.1.0.0",
+    "version": "18.0.0.3",
     "author": "Factura Electrónica de Costa Rica para Odoo(https://github.com/odoocr/l10n_cr), SEGU",
     "license": "LGPL-3",
     "category": "Localization",
@@ -12,6 +12,7 @@
         Factura Electrónica Costa Rica. Version 4.4
         """,
     "depends": [
+        'base',
         "l10n_cr",
         "account",
         "contacts",

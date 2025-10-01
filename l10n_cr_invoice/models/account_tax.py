@@ -39,3 +39,4 @@ class AccountTax(models.Model):
 
     code_cr = fields.Selection(string="Código de impuesto", selection="_get_l10n_cr_taxes_code")
     iva_tax_rate = fields.Selection(string="IVA Tax Rate", selection="_get_l10n_cr_iva_tax_rate")
+    is_exonerated = fields.Boolean(string='Usado para exoneración')

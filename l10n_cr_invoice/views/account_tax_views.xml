@@ -10,6 +10,7 @@
 			</field>
 			<field name="amount_type" position="before">
 				<field name="iva_tax_rate" invisible="country_code != 'CR'"/>
+                <field name="is_exonerated"/>
 			</field>
 		</field>
 	</record>

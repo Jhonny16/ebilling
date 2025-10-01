@@ -8,6 +8,8 @@ from .MixedClass import parsexml_
 import re as re_
 import sys
 
+from datetime import datetime, timedelta
+
 try:
     from lxml import etree as etree_
 except ImportError:
@@ -1117,7 +1119,7 @@ class ExoneracionType(GeneratedsSuper):
         self.NumeroDocumento = NumeroDocumento
         self.NombreInstitucion = NombreInstitucion
         if isinstance(FechaEmision, BaseStrType_):
-            initvalue_ = datetime_.datetime.strptime(FechaEmision, '%Y-%m-%dT%H:%M:%S')
+            initvalue_ = datetime.strptime(FechaEmision, '%Y-%m-%dT%H:%M:%S')
         else:
             initvalue_ = FechaEmision
         self.FechaEmision = initvalue_

@@ -40,8 +40,17 @@
                 <page name="exoneration_config" string="Exoneration" invisible="l10n_cr_exoneration_authorization != True">
                     <group>
                         <group>
-                            <field name="l10n_cr_exoneration_name"/>
-                            <field name="l10n_cr_document_number"/>
+                            <field name="l10n_cr_exoneration_name" invisible="1"/>
+                            <label for="l10n_cr_document_number" class="oe_inline" string="N°Documento"/>
+                            <div>
+                                <field name="l10n_cr_document_number" class="oe_inline"/>
+                                <button type="object"
+                                    name="search_exoneration_document" class="btn-link py-0">
+                                    <i class="oi oi-search"/>
+                                    Buscar
+                                </button>
+                            </div>
+<!--                            <field name="l10n_cr_document_number"/>-->
                             <field name="l10n_cr_document_type_id"/>
                             <field name="l10n_cr_institution_name"/>
                         </group>
@@ -52,13 +61,15 @@
                                 <field name="l10n_cr_percentage_exoneration" class="oe_inline"/>%
                             </div>
                             <field name="l10n_cr_date_expiration" invisible="'CR' not in fiscal_country_codes"/>
+                            <field name="tax_id" requited="l10n_cr_exoneration_authorization"
+                            domain="[('is_exonerated','=',True)]" context="{'default_is_exonerated': True}"/>
                         </group>
                     </group>
                     <field name="l10n_cr_allowed_cabys_ids">
                         <list editable="bottom" decoration-warning="cabys_code != exoneration_code">
                             <field name="parent_id" column_invisible="1" context="{'default_parent_id': id}"/>
-                            <field name="product_id"/>
-                            <field name="cabys_code" readonly="False"/>
+                            <field name="product_id" column_invisible="1"/>
+                            <field name="cabys_code" readonly="False" column_invisible="1"/>
                             <field name="exoneration_code"/>
                         </list>
                     </field>

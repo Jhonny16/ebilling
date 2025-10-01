@@ -6,6 +6,7 @@ from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_cer
 import requests
 import base64
 import logging
+import json
 
 _logger = logging.getLogger(__name__)
 
@@ -57,14 +58,74 @@ def get_economic_activities(vat):
     return response, vals
 
 
+def get_exoneration_data(exoneration_number):
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+    import time
+    # Configuración de Chrome en modo headless (sin ventana)
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    # Inicializa el driver (asegúrate de tener ChromeDriver instalado y en PATH)
+    driver = webdriver.Chrome(options=options)
+    json_text = ''
+    try:
+        autorizacion = exoneration_number
+        url = f"https://api.hacienda.go.cr/fe/ex?autorizacion={autorizacion}"
+        driver.get(url)
+        # Espera unos segundos para que cargue el contenido dinámico (ajusta si es necesario)
+        time.sleep(5)
+        # Extrae el contenido completo de la página (debería ser el JSON)
+        page_source = driver.page_source
+        # El contenido viene dentro del <pre> o <body>, puedes limpiar etiquetas HTML para quedarte solo con JSON:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(page_source, "html.parser")
+        # Buscar contenido dentro de <pre> si existe (usualmente JSON en bruto)
+        pre = soup.find("pre")
+        if pre:
+            json_text = pre.get_text()
+        else:
+            # Si no hay <pre>, extraemos todo el texto visible
+            json_text = soup.get_text()
+        #print("JSON recibido:")
+        #print(json_text)
+
+    finally:
+        driver.quit()
+
+    return json.loads(json_text)
+
+
 def get_exoneration_info(exoneration_number):
-    url_base = HACIENDA_URL_EXONERATION
-    end_point = url_base + 'autorizacion=' + exoneration_number
+    url = HACIENDA_URL_EXONERATION
+    #end_point = url_base + 'autorizacion=' + exoneration_number
+    params = {
+        "autorizacion": exoneration_number
+    }
     headers = {
-        'content-type': 'application/json',
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/117.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "es-CR,es;q=0.9,en;q=0.8",
+        "Referer": "https://api.hacienda.go.cr/",
+        "Origin": "https://api.hacienda.go.cr",
+        "Connection": "keep-alive"
     }
 
-    response = requests.get(end_point, headers=headers, timeout=10)
+    session = requests.Session()
+
+    #response = requests.get(end_point, headers=headers, timeout=10)
+    #response.encoding = 'ISO-8859-1'  # Corrige caracteres especiales
+
+    response = session.get(url, headers=headers, params=params, timeout=10, allow_redirects=True)
+    # Ajustar codificación
+    response.encoding = 'ISO-8859-1'  # o 'windows-1252'
     _logger.info(response.status_code)
     _logger.info(response.text)
 

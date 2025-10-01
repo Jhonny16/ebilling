@@ -3,7 +3,7 @@
 from odoo import models, fields, api, _, Command
 from datetime import datetime, timedelta, date
 from odoo.exceptions import ValidationError, UserError
-from ..hacienda_api import get_exoneration_info, get_economic_activities
+from ..hacienda_api import get_exoneration_info, get_economic_activities, get_exoneration_data
 import json
 import logging
 
@@ -27,7 +27,8 @@ DESCRIPTION_INSTITUTION_CODE = [
 
 
 class ResPartner(models.Model):
-    _inherit = "res.partner"
+    _name = 'res.partner'
+    _inherit = 'res.partner'
 
     commercial_name = fields.Char()
     identification_id = fields.Many2one("ce.identification.type", required=False, string="Identification Type")
@@ -60,6 +61,8 @@ class ResPartner(models.Model):
                                                  compute="_compute_l10n_cr_exoneration_state")
 
     # === COMPUTE METHODS ===#
+
+    tax_id = fields.Many2one('account.tax', string='Impuesto de exoneración')
 
     @api.depends("l10n_cr_date_expiration")
     def _compute_l10n_cr_exoneration_state(self):
@@ -108,10 +111,15 @@ class ResPartner(models.Model):
             if partner.l10n_cr_percentage_exoneration < 0.00:
                 raise ValidationError(_("The percentage exoneration cannot be negative."))
 
-    @api.onchange('l10n_cr_document_number')
-    def _onchange_exoneration_number(self):
-        if self.l10n_cr_document_number:
-            self.definir_informacion_exo(self.l10n_cr_document_number)
+    # @api.onchange('l10n_cr_document_number')
+    # def _onchange_exoneration_number(self):
+    #     if self.l10n_cr_document_number:
+    #         self.definir_informacion_exo(self.l10n_cr_document_number)
+    def search_exoneration_document(self):
+        self.ensure_one()
+        if not self.l10n_cr_document_number:
+            raise ValidationError("Ingres el N°Documento!")
+        self.definir_informacion_exo(self.l10n_cr_document_number)
 
     def definir_informacion_exo(self, l10n_cr_document_number):
         """
@@ -119,31 +127,29 @@ class ResPartner(models.Model):
         It can be overridden in custom modules to implement specific logic.
         """
 
-        response, vals = get_exoneration_info(l10n_cr_document_number)
-        if response.status_code in (200, 202) and len(response._content) > 0:
-            content = json.loads(str(response._content, 'utf-8'))
-            if 'identificacion' in content:
-                if self.vat != content.get('identificacion'):
-                    _logger.error('El código de exoneración no concuerda con la cédula del socio de negocio.')
-                    return
+        #response, vals = get_exoneration_info(l10n_cr_document_number)
+        content = get_exoneration_data(l10n_cr_document_number)
+        if content and 'identificacion' in content:
+            if self.vat != content.get('identificacion'):
+                _logger.error('El código de exoneración no concuerda con la cédula del socio de negocio.')
+                return
 
-                issue_date = datetime.strptime(str(content.get('fechaEmision'))[:10], '%Y-%m-%d')
-                self.l10n_cr_issue_date = issue_date
-                date_expiration = datetime.strptime(str(content.get('fechaVencimiento'))[:10], '%Y-%m-%d')
-                self.l10n_cr_date_expiration = date_expiration
-                self.l10n_cr_percentage_exoneration = float(content.get('porcentajeExoneracion'))
-                # self.l10n_cr_institution_name = contenido.get('nombreInstitucion')
+            issue_date = datetime.strptime(str(content.get('fechaEmision'))[:10], '%Y-%m-%d')
+            self.l10n_cr_issue_date = issue_date
+            date_expiration = datetime.strptime(str(content.get('fechaVencimiento'))[:10], '%Y-%m-%d')
+            self.l10n_cr_date_expiration = date_expiration
+            self.l10n_cr_percentage_exoneration = float(content.get('porcentajeExoneracion'))
+            self.l10n_cr_institution_name = content.get('CodigoInstitucion')
 
-                document_type = content.get('tipoDocumento')
-                exoneration_type_id = self.env["ce.exoneration.type"].search(
-                    [('ce_code', '=', document_type.get('codigo'))], limit=1)
-                if exoneration_type_id:
-                    self.l10n_cr_document_type_id = exoneration_type_id.id
+            document_type = content.get('tipoDocumento')
+            exoneration_type_id = self.env["ce.exoneration.type"].search([('ce_code', '=', document_type.get('codigo'))], limit=1)
+            if exoneration_type_id:
+                self.l10n_cr_document_type_id = exoneration_type_id.id
 
-                if content.get('cabys'):
-                    self.l10n_cr_allowed_cabys_ids = [Command.clear()]
-                    self.l10n_cr_allowed_cabys_ids = [Command.create({'exoneration_code': code, 'cabys_code': code}) for
-                                                      code in content.get('cabys')]
+            if content.get('cabys'):
+                self.l10n_cr_allowed_cabys_ids = [Command.clear()]
+                self.l10n_cr_allowed_cabys_ids = [Command.create({'exoneration_code': code, 'cabys_code': code}) for
+                                                  code in content.get('cabys')]
 
 
 class ResPartnerCabysLine(models.Model):
