@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_caecr_view_search" model="ir.ui.view">
+        <field name="name">res.caecr.view.search</field>
+        <field name="model">ce.economic.activity</field>
+        <field name="arch" type="xml">
+            <search string="Document">
+                <field name="code"/>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+     <record id="view_res_caecr_form" model="ir.ui.view">
+        <field name="name">view.res.caecr_form</field>
+        <field name="model">ce.economic.activity</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Actividades Económicas">
+                <sheet>
+                    <group col="4" colspan="2">
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="sequence"/>
+                        <field name="active" widget="boolean_toggle"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_res_caecr_tree" model="ir.ui.view">
+        <field name="name">view.res.caecr.tree</field>
+        <field name="model">ce.economic.activity</field>
+        <field name="arch" type="xml">
+            <list default_order="sequence" string="Economic Activities">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="sequence" widget="handle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_res_caecr" model="ir.actions.act_window">
+        <field name="name">Economic Activities</field>
+        <field name="res_model">ce.economic.activity</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_res_caecr_tree"/>
+    </record>
+</odoo>

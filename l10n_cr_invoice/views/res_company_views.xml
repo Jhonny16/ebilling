@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form" model="ir.ui.view">
+        <field name="name">res.company.form.inherit</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <form>
+                <field name="setting_id" invisible="1"/>
+                <field name="l10n_cr_auth_user" invisible="1"/>
+                <field name="l10n_cr_auth_pass" invisible="1"/>
+                <field name="l10n_cr_test_env" invisible="1"/>
+            </form>
+            <xpath expr="//page[1]" position="after">
+                <page string="Facturación Electrónica" invisible="country_code != 'CR'">
+                    <p class="oe_grey">
+                        Configure the company economic activities.
+                    </p>
+                    <div>
+                        <field name="l10n_cr_economic_activity_ids" nolabel="1"
+                               widget="many2many_tags" options="{'no_create_edit': True}" contect="{'default_order': sequence}"/>
+                    </div>
+                    <group col="2">
+                        <button type="object" class="btn-link" name="l10n_cr_action_view_economic_activity" colspan="2"
+                                context="{'search_default_company_id': context.get('active_id'), 'default_company_id': context.get('active_id')}" string="View Detail"/>
+                        <button name="l10n_cr_get_economic_activity" colspan="2" nolabel="1" string="Update Economic Activities desde API del MH"
+                                type="object" class="oe_edit_only oe_highlight oe_right" title="Actualiza las actividades económicas desde API del MH."/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

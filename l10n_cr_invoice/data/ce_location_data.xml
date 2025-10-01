@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="sucursal_1" model="ce.location">
+            <field name="name">Casa Matriz</field>
+            <field name="description">Casa Matriz</field>
+            <field name="code">001</field>
+        </record>
+    </data>
+</odoo>

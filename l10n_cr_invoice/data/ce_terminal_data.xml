@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="terminal_1" model="ce.terminal">
+            <field name="name">Terminal 1</field>
+            <field name="code">00001</field>
+            <field name="location_id" ref="l10n_cr_invoice.sucursal_1"/>
+        </record>
+    </data>
+</odoo>

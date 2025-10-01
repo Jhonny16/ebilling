@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Terminal o punto de venta -->
+
+    <record id="view_terminal_form" model="ir.ui.view">
+        <field name="name">ce.terminal.form</field>
+        <field name="model">ce.terminal</field>
+        <field name="arch" type="xml">
+            <form string="Terminal">
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ('cancelled', 'draft')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active"/>
+                </header>
+                <sheet string="Terminal">
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button"
+                                name="action_view_sequence"
+                                icon="fa-arrow-right" type="object"
+                                groups="base.group_system"
+                                invisible="state == 'draft'">
+                            <span class="o_stat_text">Sequences</span>
+                        </button>
+                    </div>
+                    <!-- Invisible fields -->
+                    <field name="l10n_cr_available_economic_activities_ids" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="location_id" readonly="state != 'draft'"/>
+                            <field name="economic_activity_id" domain="[('id', 'in', l10n_cr_available_economic_activities_ids)]"/>
+                        </group>
+                        <group>
+                            <field name="code" readonly="state != 'draft'"/>
+                            <field name="company_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_terminal_tree" model="ir.ui.view">
+        <field name="name">ce.terminal.tree</field>
+        <field name="model">ce.terminal</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="location_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="state" decoration-success="state == 'active'" widget="badge"
+                                    decoration-danger="state == 'cancelled'"
+                                    decoration-info="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_terminal_form" model="ir.actions.act_window">
+        <field name="name">Terminal</field>
+        <field name="res_model">ce.terminal</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_terminal_tree"/>
+    </record>
+    <menuitem id="menu_terminal" sequence="3" action="action_terminal_form" parent="ecf_setting_main"/>
+</odoo>

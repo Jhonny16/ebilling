@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ce_reference_document_search" model="ir.ui.view">
+        <field name="name">ce.reference.document.view.search</field>
+        <field name="model">ce.reference.document</field>
+        <field name="arch" type="xml">
+            <search string="Reference Document">
+                <field name="name"/>
+                <field name="code"/>
+            </search>
+        </field>
+    </record>
+    <record id="view_ce_reference_document_tree" model="ir.ui.view">
+        <field name="name">view.ce.reference.document.tree</field>
+        <field name="model">ce.reference.document</field>
+        <field name="arch" type="xml">
+            <list string="Reference Document">
+                <field name="code"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_ce_reference_code_search" model="ir.ui.view">
+        <field name="name">ce.reference.doce.view.search</field>
+        <field name="model">ce.reference.code</field>
+        <field name="arch" type="xml">
+            <search string="Reference Code">
+                <field name="name"/>
+                <field name="code"/>
+            </search>
+        </field>
+    </record>
+    <record id="view_ce_reference_code_tree" model="ir.ui.view">
+        <field name="name">view.ce.reference.code.tree</field>
+        <field name="model">ce.reference.code</field>
+        <field name="arch" type="xml">
+            <list string="Reference Code">
+                <field name="code"/>
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+</odoo>

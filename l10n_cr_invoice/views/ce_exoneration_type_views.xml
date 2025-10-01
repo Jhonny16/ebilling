@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cr_exoauthdoc_type_form" model="ir.ui.view">
+        <field name="name">ce.exoneration.type.form</field>
+        <field name="model">ce.exoneration.type</field>
+        <field name="arch" type="xml">
+            <form string="Exoneration / Authorization Document Type">
+                <sheet string="Exoneration / Authorization Document Type">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="ce_code"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="cr_exoauthdoc_type_tree" model="ir.ui.view">
+        <field name="name">ce.exoneration.type.tree</field>
+        <field name="model">ce.exoneration.type</field>
+        <field name="arch" type="xml">
+            <list string="Exoneration Types">
+                <field name="name"/>
+                <field name="ce_code"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_exoneration_type" model="ir.actions.act_window">
+		<field name="name">Exoneration Types</field>
+		<field name="res_model">ce.exoneration.type</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="view_mode">list,form</field>
+	</record>
+    <menuitem id="menu_exoneration_type" parent="menu_electronic_invoice" sequence="4" action="action_exoneration_type"/>
+</odoo>

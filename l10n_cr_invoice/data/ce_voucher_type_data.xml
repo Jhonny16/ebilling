@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="voucher_01" model="ce.voucher.type">
+            <field name="name">Factura electrónica</field>
+            <field name="code">01</field>
+            <field name="internal_type">invoice</field>
+            <field name="move_type">out_invoice</field>
+        </record>
+        <record id="voucher_02" model="ce.voucher.type">
+            <field name="name">Nota de débito electrónica</field>
+            <field name="code">02</field>
+            <field name="internal_type">debit_note</field>
+        </record>
+        <record id="voucher_03" model="ce.voucher.type">
+            <field name="name">Nota de crédito electrónica</field>
+            <field name="code">03</field>
+            <field name="internal_type">credit_note</field>
+        </record>
+        <record id="voucher_04" model="ce.voucher.type">
+            <field name="name">Tiquete Electrónico</field>
+            <field name="code">04</field>
+            <field name="internal_type">invoice</field>
+            <field name="move_type">out_invoice</field>
+        </record>
+        <record id="voucher_05" model="ce.voucher.type">
+            <field name="name">Confirmación de aceptación del comprobante electrónico</field>
+            <field name="code">05</field>
+            <field name="move_type">mh</field>
+        </record>
+        <record id="voucher_06" model="ce.voucher.type">
+            <field name="name">Confirmación de aceptación parcial del comprobante electrónico</field>
+            <field name="code">06</field>
+            <field name="move_type">mh</field>
+        </record>
+        <record id="voucher_07" model="ce.voucher.type">
+            <field name="name">Confirmación de rechazo del comprobante electrónico</field>
+            <field name="code">07</field>
+            <field name="move_type">mh</field>
+        </record>
+        <record id="voucher_08" model="ce.voucher.type">
+            <field name="name">Factura electrónica de compra</field>
+            <field name="code">08</field>
+            <field name="internal_type">invoice</field>
+            <field name="move_type">in_invoice</field>
+        </record>
+        <record id="voucher_09" model="ce.voucher.type">
+            <field name="name">Factura electrónica de exportación</field>
+            <field name="code">09</field>
+            <field name="internal_type">invoice</field>
+            <field name="move_type">out_invoice</field>
+        </record>
+        <record id="voucher_10" model="ce.voucher.type">
+            <field name="name">Recibo Electronico de Pago</field>
+            <field name="code">10</field>
+            <field name="internal_type">invoice</field>
+            <field name="move_type">out_invoice</field>
+        </record>
+    </data>
+</odoo>

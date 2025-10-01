@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_res_partner_exonerated_form" model="ir.ui.view">
+        <field name="name">res.partner.exonerated.form</field>
+        <field name="model">res.partner.exonerated</field>
+        <field name="arch" type="xml">
+            <form string="Terminal">
+                <header>
+                    <button name="search_exoneration" string="Consultar" type="object"
+                            class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="document_number"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="vat" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Datos">
+                        <group>
+                            <field name="identification"/>
+                            <field name="project_code"/>
+                            <field name="exoneration_percentage"/>
+                            <field name="authorization_code"/>
+                            <field name="authorization_type"/>
+                        </group>
+                        <group>
+                            <field name="document_type"/>
+                            <field name="date_emission"/>
+                            <field name="date_due"/>
+                            <field name="year"/>
+                            <field name="institution_code"/>
+                            <field name="institution_nombre"/>
+                            <field name="cabys_has"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cabys">
+                            <field name="cabys" nolabel="1"
+                                   placeholder="Ingrese los cabys separados por comas.Ejemplo: 9912133,012131,0121213"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_res_partner_exonerated_tree" model="ir.ui.view">
+        <field name="name">res.partner.exonerated.tree</field>
+        <field name="model">res.partner.exonerated</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="document_number"/>
+                <field name="partner_id"/>
+                <field name="vat"/>
+                <field name="identification"/>
+                <field name="date_emission"/>
+                <field name="date_due"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_res_partner_exonerated" model="ir.actions.act_window">
+        <field name="name">Exoneración de clientes</field>
+        <field name="res_model">res.partner.exonerated</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_res_partner_exonerated" parent="account.menu_finance_receivables"
+              action="action_res_partner_exonerated" sequence="200"/>
+
+
+</odoo>

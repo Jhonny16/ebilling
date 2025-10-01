@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit" model="ir.ui.view">
+        <field name="name">account.move.form.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <form>
+                <!-- Invisible fields -->
+                <field name="xml_file" invisible="1"/>
+                <field name="l10n_cr_fiscal_journal" invisible="1"/>
+                <field name="l10n_cr_available_voucher_type_ids" invisible="1"/>
+                <field name="l10n_cr_available_economic_activities_ids" invisible="1"/>
+                <field name="is_exportation" invisible="1"/>
+                <field name="l10n_cr_buyer_activity_id" invisible="1"/>
+                <field name="l10n_cr_has_exoneration" invisible="1"/>
+                <field name="l10n_cr_message_detail" invisible="1"/>
+            </form>
+            <xpath expr="//header" position="after">
+                <div class="alert alert-info mb-0" role="alert"
+                     invisible="ind_state != 'not_sent' or state != 'posted'">
+                    Este servicio de facturación electrónica procesará la factura asincronicamente
+                    <button class="btn btn-link p-0" type="object" name="action_send_to_hacienda"
+                            style="padding: 0; vertical-align: baseline;">Enviar a Hacienda ahora</button>.
+                </div>
+                <div class="alert alert-info mb-0" role="alert"
+                     invisible="ind_state not in ['recibido', 'procesando'] or state != 'posted'">
+                    El comprobante aun no ha sido validado <button class="btn btn-link p-0" type="object"
+                                                                   name="action_request_state_to_hacienda"
+                                                                   style="padding: 0; vertical-align: baseline;">
+                    Consultar estado Hacienda ahora</button>.
+                </div>
+            </xpath>
+            <xpath expr="//group[@id='header_left_group']" position="inside">
+                <field name="l10n_cr_situation" readonly="1" invisible="move_type == 'entry' or not l10n_cr_fiscal_journal"/>
+                <field name="terminal_id"
+                       invisible="move_type == 'entry' or not l10n_cr_fiscal_journal"
+                       domain="[('company_id', '=', company_id), ('state', '=', 'active')]"
+                       readonly="state != 'draft'"/>
+                <field name="l10n_cr_document_number"
+                       invisible="not l10n_cr_document_number or (move_type in ('out_invoice', 'out_refund')) or country_code != 'CR'"
+                       readonly="state != 'draft'"/>
+            </xpath>
+<!--            <xpath expr="//group[@id='header_left_group']/div" position="inside">-->
+<!--                <div>-->
+<!--                    <div class="text-muted" invisible="not l10n_cr_has_exoneration">-->
+<!--                        Cliente exonerado-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </xpath>-->
+            <xpath expr="//span[hasclass('o_form_label')]" position="replace">
+                <span class="o_form_label">
+                    <field name="move_type" invisible="move_type == 'entry'" readonly="1"
+                           nolabel="1"/>
+                </span>
+            </xpath>
+            <xpath expr="//field[@name='tax_totals']" position="replace">
+                <field name="amount_discount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                       invisible="not amount_discount"/>
+                <field name="tax_totals" string="Subtotal" widget="account-tax-totals-field" nolabel="1" colspan="2"/>
+            </xpath>
+            <xpath expr="//group[@id='header_right_group']" position="inside">
+                <field name="voucher_type_id"
+                       invisible="move_type == 'entry' or country_code != 'CR'"
+                       readonly="posted_before"
+                       required="l10n_cr_fiscal_journal"
+                       options="{'no_open': True, 'no_create': True}"
+                       domain="[('id', 'in', l10n_cr_available_voucher_type_ids)]"/>
+                <field name="document_id" invisible="not document_id or country_code != 'CR'"/>
+                <field name="ind_state" invisible="not document_id or country_code != 'CR'" widget="l10n_cr_document_state"/>
+                <field name="economic_activity_id" readonly="state != 'draft'"
+                       options="{'no_open': True, 'no_create': True}"
+                       invisible="move_type == 'entry' or not l10n_cr_fiscal_journal"
+                       domain="[('id', 'in', l10n_cr_available_economic_activities_ids)]"/>
+                <field name="currency_rate" groups="base.group_multi_currency"
+                       invisible="move_type == 'entry' or not l10n_cr_fiscal_journal or currency_id == company_currency_id"
+                       readonly="state != 'draft'"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Facturación Electrónica" id="page_fe"
+                      invisible="move_type == 'entry' or not l10n_cr_fiscal_journal">
+                    <group invisible="not l10n_cr_fiscal_journal">
+                        <group invisible="not document_id">
+                            <field name="QR_code" nolabel="1" widget="image" style="width: 120px; height: 120px;"
+                                   invisible="not document_id"/>
+                        </group>
+                        <group>
+<!--                            <field name="journal_pay_ids" widget="many2many_tags" options="{'no_create':1}"-->
+<!--                                   domain="[('type', 'in', ['cash','bank'])]" readonly="state != 'draft'"/>-->
+                            <field name="l10n_cr_payment_method_id" options="{'no_create':1}"
+                                   readonly="state != 'draft'"/>
+<!--                            <field name="l10n_cr_payment_method_ids" widget="many2many_tags" options="{'no_create':1}"-->
+<!--                                   readonly="state != 'draft'"/>-->
+                            <field name="payment_term_type_id" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                </page>
+<!--                <page string="Información de referencia FE" invisible="not (move_type in ['out_refund', 'out_refund'] or debit_origin_id or l10n_cr_is_rep) or not l10n_cr_fiscal_journal">-->
+                <page string="Información de referencia FE" invisible="not (move_type in ['out_refund', 'out_refund'] or debit_origin_id) or not l10n_cr_fiscal_journal">
+                    <group>
+                        <field name="cod_doc_ref" invisible="1"/>
+                        <group>
+                            <field name="tipo_doc_reference_id"
+                                   required="l10n_cr_situation == 'contingency' and move_type == 'out_invoice'"
+                                   readonly="document_id != False"/>
+                            <field name="cod_referencia_id"
+                                   required="l10n_cr_situation == 'contingency' and move_type == 'out_invoice' and cod_doc_ref not in ['13',False,None]"
+                                   readonly="document_id != False"/>
+                        </group>
+                        <group>
+                            <field name="numero_ref"
+                                   required="l10n_cr_situation == 'contingency' and move_type == 'out_invoice' and cod_doc_ref not in ['13', False, None]"
+                                   readonly="document_id != False"/>
+                            <field name="date_issue_ref"
+                                   required="l10n_cr_situation == 'contingency' and move_type == 'out_invoice' and tipo_doc_reference_id != False"
+                                   readonly="document_id != False"/>
+                            <field name="reason_ref"
+                                   required="l10n_cr_situation == 'contingency' and move_type == 'out_invoice' and cod_doc_ref not in ['13', False, None]"
+                                   readonly="document_id != False"
+                                   placeholder="Razón de referencia"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Receipt Payment" invisible="not l10n_cr_reference_rep_ids">
+                    <field name="l10n_cr_reference_rep_ids" readonly="True">
+                        <list>
+                            <field name="name"/>
+                            <field name="ref_code"/>
+                            <field name="ref_doctype"/>
+                            <field name="ref_number"/>
+                            <field name="ref_date"/>
+                            <button type="object" name="action_view_document_reference" string="Show"/>
+                            <button type="object" name="action_download_file" string="Download"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//form/sheet/notebook/page/field[@name='invoice_line_ids']/list/field[@name='discount']" position="after">
+                <field name="l10n_cr_discount_type_code" optional="hide"
+                    required="discount != 0"/>
+                <field name="l10n_cr_has_exoneration" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_move_tree_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.tree.inherit</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="l10n_cr_document_number" string="Consecutive" optional="show"/>
+            </field>
+            <field name="status_in_payment" position="before">
+                <field name="ind_state" widget="badge" optional="show"
+                       decoration-success="ind_state == 'aceptado'"
+                       decoration-danger="ind_state == 'rechazado'"
+                       decoration-info="ind_state == 'procesando'"/>
+            </field>
+        </field>
+    </record>
+    <record id="invoice_kanban" model="ir.ui.view">
+        <field name="name">account.invoice.kanban</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('row')][1]" position="after">
+                <div class="row mb4">
+                    <div class="col-6">
+                        <field name="l10n_cr_document_number" string="Consecutive"/>
+                    </div>
+                    <div class="col-6 text-right">
+                        <field name="ind_state" widget="label_selection" options="{'classes': {'aceptado': 'success'}}"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_invoice_exportation" model="ir.actions.act_window">
+        <field name="name">Exportation Invoice</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="account.view_invoice_tree"/>
+        <field name="domain">[('is_exportation', '=', True)]</field>
+        <field name="context">{'default_move_type': 'out_invoice','default_is_exportation': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear una Factura de Exportación
+            </p>
+        </field>
+    </record>
+<!--    <record id="action_electronic_payment_receipt" model="ir.actions.act_window">-->
+<!--        <field name="name">Electronic Payment Receipt</field>-->
+<!--        <field name="res_model">account.move</field>-->
+<!--        <field name="view_mode">list,form</field>-->
+<!--        <field name="view_id" ref="account.view_invoice_tree"/>-->
+<!--        <field name="domain">[('l10n_cr_is_rep', '=', True)]</field>-->
+<!--        <field name="context">{'default_move_type': 'out_invoice','default_l10n_cr_is_rep': True}</field>-->
+<!--        <field name="help" type="html">-->
+<!--            <p class="o_view_nocontent_smiling_face">-->
+<!--                Crear un Recibo Electrónico de Pago-->
+<!--            </p>-->
+<!--        </field>-->
+<!--    </record>-->
+
+	<menuitem id="menu_invoice_exportation" name="Exportation Invoice" action="action_invoice_exportation"
+              parent="account.menu_finance_receivables" sequence="3"/>
+<!--    <menuitem id="menu_electronic_payment_receipt" name="Electronic Payment Receipt" action="action_electronic_payment_receipt"-->
+<!--              parent="account.menu_finance_receivables" sequence="4"/>-->
+</odoo>

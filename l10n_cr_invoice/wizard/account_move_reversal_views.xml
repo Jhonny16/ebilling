@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_invoice_refund" model="ir.ui.view">
+        <field name="name">account.move.refund.form</field>
+        <field name="model">account.move.reversal</field>
+        <field name="inherit_id" ref="account.view_account_move_reversal"/>
+        <field name="arch" type="xml">
+            <form>
+                <field name="l10n_cr_fiscal_journal" invisible="1"/>
+                <field name="l10n_cr_tipo_doc_reference_id" invisible="1"/>
+                <field name="l10n_cr_voucher_type_id" invisible="1"/>
+            </form>
+            <field name="reason" position="after">
+                <field name="l10n_cr_cod_reference_id" options="{'no_open': True, 'no_create': True}"
+                       invisible="move_type == 'entry' or not l10n_cr_fiscal_journal"/>
+            </field>
+        </field>
+    </record>
+</odoo>

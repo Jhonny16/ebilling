@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_setting_form" model="ir.ui.view">
+        <field name="name">cr.ce.setting.form</field>
+        <field name="model">cr.ce.setting</field>
+        <field name="arch" type="xml">
+            <form string="Electronic Vouchers Configuration">
+                <header>
+                    <button
+                        name="action_validate_and_load"
+                        string="Validate Cert"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="state != 'unverified'"
+                    />
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <group string="General">
+                        <group>
+                            <field name="name"/>
+<!--                            <field name="environment"/>-->
+                        </group>
+                        <group>
+                            <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+<!--                    <group string="API Autentificacion">-->
+<!--                        <group>-->
+<!--                            <field name="auth_user"/>-->
+<!--&lt;!&ndash;                            <field name="auth_pass" password="True"/>&ndash;&gt;-->
+<!--                        </group>-->
+<!--                        <group>-->
+<!--&lt;!&ndash;                            <field name="auth_user"/>&ndash;&gt;-->
+<!--                            <field name="auth_pass" password="True"/>-->
+<!--                        </group>-->
+<!--&lt;!&ndash;                        <div>&ndash;&gt;-->
+<!--&lt;!&ndash;                            <button name="action_verify" type="object" string="PROBAR CONEXION" class="oe_highlight"&ndash;&gt;-->
+<!--&lt;!&ndash;                                    invisible="not auth_user or not auth_pass"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
+<!--                    </group>-->
+                    <group string="Informacion de Certificado">
+                        <group>
+                            <field name="p12_name" invisible="1"/>
+                            <field name="p12_file" filename="p12_name"/>
+<!--                            <field name="p12_pin" password="True"/>-->
+                        </group>
+                        <group>
+<!--                            <field name="p12_name" invisible="1"/>-->
+<!--                            <field name="p12_file" filename="p12_name"/>-->
+                            <field name="p12_pin" password="True"/>
+                        </group>
+                    </group>
+                    <notebook colspan="2">
+                        <page string="Cert Info">
+                            <group invisible="state == 'unverified'">
+                                <field name="issue_date"/>
+                                <field name="subject_common_name"/>
+                                <field name="subject_serial_number" groups="base.group_system"/>
+                                <field name="expire_date"/>
+                                <field name="issuer_common_name"/>
+                                <field name="cert_serial_number" groups="base.group_system"/>
+                                <field name="cert_version" groups="base.group_system"/>
+                            </group>
+                        </page>
+                        <page string="Notification">
+                            <group>
+                                <field name="days_for_notification" required="1" />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter reload_on_attachment="True"/>
+            </form>
+        </field>
+    </record>
+    <record id="view_ce_ce_setting_tree" model="ir.ui.view">
+        <field name="name">cr.ce.setting.tree</field>
+        <field name="model">cr.ce.setting</field>
+        <field name="arch" type="xml">
+            <list string="Electronic Vouchers Configuration">
+                <field name="name"/>
+<!--                <field name="environment"/>-->
+<!--                <field name="auth_user"/>-->
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_setting_form" model="ir.actions.act_window">
+        <field name="name">Electronic Vouchers Configuration</field>
+        <field name="res_model">cr.ce.setting</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="view_id" ref="view_ce_ce_setting_tree"/>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Haga clic para agregar un registro.
+            </p>
+            <p>
+                Una registro de Configuración de Comprobantes Electrónicos permite añadir toda la información necesaria
+                para el envio de documentos al Ministerio de Hacienda.
+            </p>
+        </field>
+    </record>
+    <menuitem id="ecf_setting_main" name="Configuration" parent="menu_hacienda"/>
+<!--    <menuitem id="menu_setting_fe" sequence="1" action="action_setting_form" parent="ecf_setting_main"/>-->
+</odoo>

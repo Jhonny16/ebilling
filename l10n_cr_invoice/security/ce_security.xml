@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="ce_document_simple_comp_rule" model="ir.rule">
+            <field name="name">CE Document simple-company</field>
+            <field name="model_id" ref="model_ce_document"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+        <record id="ce_terminal_simple_comp_rule" model="ir.rule">
+            <field name="name">CE Terminal simple-company</field>
+            <field name="model_id" ref="model_ce_terminal"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+        <record id="ce_settings_comp_rule" model="ir.rule">
+            <field name="name">CE Settings multi-company</field>
+            <field name="model_id" ref="model_cr_ce_setting"/>
+            <field name="domain_force">['|',  ('company_id', 'in', company_ids), ('company_id', 'parent_of', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        </record>
+    </data>
+</odoo>

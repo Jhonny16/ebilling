@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="account.account_payment_term_immediate" model="account.payment.term">
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_01"/>
+            <field name="name">Contado</field>
+        </record>
+
+        <record id="account.account_payment_term_15days" model="account.payment.term">
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_02"/>
+        </record>
+        <record id="account.account_payment_term_21days" model="account.payment.term">
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_02"/>
+        </record>
+        <record id="account.account_payment_term_30days" model="account.payment.term">
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_02"/>
+        </record>
+        <record id="account.account_payment_term_45days" model="account.payment.term">
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_02"/>
+        </record>
+
+        <record id="account_payment_term_consignacion" model="account.payment.term">
+            <field name="name">Apartado</field>
+            <field name="note">Término Pago: Apartado</field>
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_04"/>
+        </record>
+        <record id="account_payment_term_financiero" model="account.payment.term">
+            <field name="name">Arrendamiento Financiero</field>
+            <field name="note">Término Pago: Arrendamiento en función Financiera</field>
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_06"/>
+        </record>
+        <record id="account_payment_term_opcion_compra" model="account.payment.term">
+            <field name="name">Opción de Compra</field>
+            <field name="note">Término Pago: Arrendamiento con opción de compra</field>
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_05"/>
+        </record>
+        <record id="account_payment_term_otros" model="account.payment.term">
+            <field name="name">Otros</field>
+            <field name="note">Término Pago: Otros</field>
+            <field name="payment_type_id" ref="l10n_cr_invoice.payment_type_99"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_account_debit_note_inherited" model="ir.ui.view">
+        <field name="name">view.account.debit.note.inherited</field>
+        <field name="model">account.debit.note</field>
+        <field name="inherit_id" ref="account_debit_note.view_account_debit_note"/>
+        <field name="arch" type="xml">
+            <form>
+                <field name="l10n_cr_fiscal_journal" invisible="1"/>
+                <field name="l10n_cr_voucher_type_id" invisible="1"/>
+            </form>
+            <field name="reason" position="after">
+                <field name="l10n_cr_cod_reference_id" options="{'no_open': True, 'no_create': True}"
+                       invisible="move_type == 'entry' or not l10n_cr_fiscal_journal"/>
+            </field>
+        </field>
+    </record>
+</odoo>

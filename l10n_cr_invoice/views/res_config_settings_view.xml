@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="res_config_settings_view_form11" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherited11</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='contacts_settings']" position="inside">
+                <div id="hacienda_autocomplete">
+                    <div class='row mt16 o_settings_container' name="hacienda_autocomplete_setting">
+                        <div class="col-xs-12 col-md-6 o_setting_box"
+                             title="When populating your address book, Odoo is Connected with Hacienda Server"
+                             id="hacienda_partner_autocomplete">
+                            <div class="o_setting_left_pane">
+                                <field name="module_l10n_cr_partner_autocomplete"/>
+                            </div>
+                            <div class="o_setting_right_pane" id="hacienda_partner_autocomplete_settings">
+                                <label for="module_l10n_cr_partner_autocomplete"/>
+                                <div class="text-muted">
+                                    Automatically Get Data From Hacienda
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    <record id="res_config_settings_view_form11" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.l10n_cr_invoice</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='invoicing_settings']" position="after">
+                <block title="Facturación Electrónica (CR)" name="fe_setting_container" invisible="country_code != 'CR'">
+                    <setting id="activity_setting" documentation="/applications/productivity/mail_plugins.html" help="Integrate with mail client plugins">
+                        <span class="o_form_label">
+                            Actividades Económicas
+                        </span>
+                        <br/>
+                        <div class="text-muted">
+                            <a href="https://da.go.cr/wp-content/uploads/2016/06/DA-GRH-0067-Gu%C3%ADa-CIIU-INEC-Costa-Rica.pdf">Clasificador Actividades Económicas</a>
+                        </div>
+                        <div class="mt8">
+                            <button name="%(l10n_cr_invoice.action_res_caecr)d" icon="oi-arrow-right" type="action" string="Manage Economic Activities" class="btn-link"/>
+                        </div>
+                    </setting>
+                    <setting string="Provider System"
+                             help="Numero identificación del proveedor de sistemas para emisión de Comprobantes.">
+                        <div class="row">
+                            <label for="l10n_cr_provider_system" class="col-lg-3 o_light_label"/>
+                            <field name="l10n_cr_provider_system"/>
+                        </div>
+                    </setting>
+                    <setting string="Environment to Hacienda"
+                             help="Configure your environment to sign your electronic documents.">
+                        <div class="row">
+                            <label string="Cert" for="l10n_cr_setting_id" class="col-lg-3 o_light_label"/>
+                            <field name="l10n_cr_setting_id" class="oe_inline"/>
+                        </div>
+                        <div class="row">
+                            <label string="User API" for="l10n_cr_auth_user" class="col-lg-3 o_light_label"/>
+                            <field name="l10n_cr_auth_user" class="oe_inline"/>
+                        </div>
+                        <div class="row">
+                            <label string="Passw Api" for="l10n_cr_auth_pass" class="col-lg-3 o_light_label"/>
+                            <field name="l10n_cr_auth_pass" class="oe_inline" password="True"/>
+                        </div>
+                        <div class="row">
+                            <label string="Testing" for="l10n_cr_test_env" class="col-lg-3 o_light_label"/>
+                            <field name="l10n_cr_test_env" class="oe_inline"/>
+                        </div>
+                        <button name="l10n_cr_action_verify" type="object" string="PROBAR CONEXION" class="oe_highlight"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
